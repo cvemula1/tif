@@ -8,9 +8,9 @@ import logging
 import re
 import urllib.request
 import urllib.error
-from dataclasses import dataclass, field
-from datetime import datetime, date
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from datetime import date
+from typing import Dict, Optional, Tuple
 
 from tif.core.trust_card import GateResult, Severity, Verdict
 
