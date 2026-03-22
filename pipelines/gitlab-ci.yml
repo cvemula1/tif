@@ -1,0 +1,37 @@
+# Sample GitLab CI pipeline using TIF Trust Gate
+# Add this to your .gitlab-ci.yml
+
+stages:
+  - build
+  - verify
+
+variables:
+  IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE .
+    - docker push $IMAGE
+
+verify-trust:
+  stage: verify
+  image: python:3.12-slim
+  before_script:
+    - pip install tif
+    # Install cosign
+    - curl -sSfL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+        -o /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+    # Install trivy
+    - curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+        | sh -s -- -b /usr/local/bin
+  script:
+    - tif verify $IMAGE --policy-pack cis-l1 --fail-on high --ci --output trust-card.json
+  artifacts:
+    paths:
+      - trust-card.json
+    when: always

@@ -1,0 +1,49 @@
+# Sample GitHub Actions workflow using TIF Trust Gate
+# Add this to .github/workflows/tif-verify.yml
+
+name: Image Trust Verification
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write    # Required for keyless signing
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+      - name: Push image
+        run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      # Option 1: Docker image (recommended -- all tools included)
+      - name: Verify image trust
+        run: |
+          docker run --rm \
+            cvemula1/tif verify \
+            ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            --policy-pack cis-l1 \
+            --fail-on high \
+            --require-sbom \
+            --ci
+
+      # Option 2: Use TIF GitHub Action
+      # - name: Verify image trust
+      #   uses: cvemula1/tif@main
+      #   with:
+      #     image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+      #     policy-pack: "cis-l1"
+
+      # Option 3: pip install (needs cosign + trivy on PATH)
+      # - name: Install TIF
+      #   run: pip install tif
+      # - name: Verify
+      #   run: tif verify ghcr.io/${{ github.repository }}:${{ github.sha }} --policy-pack cis-l1 --ci

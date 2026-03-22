@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tif"
+version = "0.1.0"
+description = "The Trust Gate for Container Images — verify signatures, SBOMs, attestations, vulnerabilities, and compliance in one command"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+authors = [{name = "cvemula1", email = "cvemula1@users.noreply.github.com"}]
+keywords = [
+    "container", "security", "trust", "sbom", "cosign", "sigstore",
+    "slsa", "attestation", "vulnerability", "compliance", "devsecops",
+    "supply-chain", "opa", "rego", "docker", "kubernetes",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Software Distribution",
+]
+dependencies = [
+    "rich>=13.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+cosign = ["sigstore>=3.0"]
+trivy = []
+all = ["sigstore>=3.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/cvemula1/tif"
+Repository = "https://github.com/cvemula1/tif"
+Issues = "https://github.com/cvemula1/tif/issues"
+
+[project.scripts]
+tif = "tif.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tif*"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+build_command = "pip install build && python -m build"
+commit_message = "chore(release): {version} [skip ci]"
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["feat", "fix", "perf", "refactor", "docs", "chore", "ci", "test"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "refactor"]

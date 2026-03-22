@@ -1,0 +1,99 @@
+name: "TIF Trust Gate"
+description: "Verify container image trust — signatures, SBOMs, attestations, vulnerabilities, and compliance in one step"
+author: "cvemula1"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  image:
+    description: "Container image reference to verify (e.g. registry.io/app:1.0)"
+    required: true
+  version:
+    description: "TIF version to install (default: latest)"
+    required: false
+    default: ""
+  policy-pack:
+    description: "Built-in policy pack: default, cis-l1, cis-l2, nist-800-190, dod-stig"
+    required: false
+    default: "default"
+  fail-on:
+    description: "Fail if vulnerability at this severity or higher (critical, high, medium, low)"
+    required: false
+    default: "critical"
+  require-sbom:
+    description: "Fail if no SBOM attached"
+    required: false
+    default: "false"
+  require-provenance:
+    description: "Fail if no SLSA provenance"
+    required: false
+    default: "false"
+  format:
+    description: "Output format (table, json)"
+    required: false
+    default: "table"
+  cosign-key:
+    description: "Path to cosign public key (default: keyless Sigstore)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+
+    - name: Install cosign
+      uses: sigstore/cosign-installer@v3
+
+    - name: Install Trivy
+      shell: bash
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+          | sh -s -- -b /usr/local/bin
+
+    - name: Install TIF
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.version }}" ]; then
+          pip install "tif==${{ inputs.version }}"
+        else
+          pip install tif
+        fi
+
+    - name: Run TIF Verify
+      shell: bash
+      run: |
+        ARGS="verify ${{ inputs.image }}"
+        ARGS="$ARGS --policy-pack ${{ inputs.policy-pack }}"
+        ARGS="$ARGS --fail-on ${{ inputs.fail-on }}"
+        ARGS="$ARGS --ci"
+
+        if [ "${{ inputs.require-sbom }}" = "true" ]; then
+          ARGS="$ARGS --require-sbom"
+        fi
+
+        if [ "${{ inputs.require-provenance }}" = "true" ]; then
+          ARGS="$ARGS --require-provenance"
+        fi
+
+        if [ -n "${{ inputs.cosign-key }}" ]; then
+          ARGS="$ARGS --key ${{ inputs.cosign-key }}"
+        fi
+
+        ARGS="$ARGS --format ${{ inputs.format }}"
+        ARGS="$ARGS --ascii"
+        ARGS="$ARGS --output trust-card.json"
+
+        tif $ARGS
+
+    - name: Upload Trust Card
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: trust-card
+        path: trust-card.json
