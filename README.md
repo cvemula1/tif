@@ -468,7 +468,7 @@ tif/
 ## Roadmap
 
 - [x] **v0.1** — Trust Card schema, verifier CLI, 5 policy packs, 7 validators (incl. EOL), NIST-aligned scoring, Dockerfile scanner, hardener, registry push, CI/CD pipelines, GitHub Action
-- [ ] **v0.2** — VM image support (AMI, Azure VM, GCP), Notary v2, SARIF output
+- [ ] **v0.2** — Notary v2 signing, SARIF output format
 - [ ] **v0.3** — Trust Card registry (store/query Trust Cards), webhook notifications
 - [ ] **v0.4** — ML-based image risk scoring, auto-remediation suggestions
 
