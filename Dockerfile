@@ -4,7 +4,7 @@ FROM debian:bookworm-slim AS tooling
 ARG COSIGN_VERSION=v2.4.1
 ARG TRIVY_VERSION=0.69.3
 ARG SYFT_VERSION=v1.19.0
-ARG TARGETARCH=amd64
+ARG TARGETARCH
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates \

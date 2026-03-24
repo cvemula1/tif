@@ -27,6 +27,8 @@ TIF cuts through the noise: one command produces a **compliance-ready Trust Card
 
 ### Docker (recommended — all tools included, zero setup)
 
+Multi-arch images for **linux/amd64** and **linux/arm64** (Apple Silicon). All trust tools (cosign, trivy, syft, skopeo) are pre-installed.
+
 ```bash
 # Primary registry: GHCR (signed, SBOM-attested)
 docker run --rm ghcr.io/cvemula1/tif verify alpine:3.20 --only-fixable
