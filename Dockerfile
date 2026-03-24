@@ -2,9 +2,9 @@
 FROM debian:bookworm-slim AS tooling
 
 ARG COSIGN_VERSION=v2.4.1
-ARG TRIVY_VERSION=0.59.1
+ARG TRIVY_VERSION=0.69.3
 ARG SYFT_VERSION=v1.19.0
-ARG TARGETARCH=amd64
+ARG TARGETARCH
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates \
@@ -16,11 +16,9 @@ RUN curl -sSfL \
     -o /usr/local/bin/cosign \
     && chmod +x /usr/local/bin/cosign
 
-# trivy — pinned release via official install script with version pin
-RUN curl -sSfL \
-    "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
-    | tar -xz -C /usr/local/bin trivy \
-    && chmod +x /usr/local/bin/trivy
+# trivy — pinned release via official install script
+RUN curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+    | sh -s -- -b /usr/local/bin v${TRIVY_VERSION}
 
 # syft — pinned release
 RUN curl -sSfL \

@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
 
@@ -138,7 +138,7 @@ def analyze_dockerfile(
                 ))
 
     # Check for missing USER instruction
-    has_user = any(re.match(r"^\s*USER\s+", l, re.IGNORECASE) for l in lines)
+    has_user = any(re.match(r"^\s*USER\s+", line, re.IGNORECASE) for line in lines)
     if not has_user:
         findings.append(DockerfileFinding(
             line=0, rule="DF-100", severity="high",
@@ -147,16 +147,13 @@ def analyze_dockerfile(
         ))
 
     # Check for missing HEALTHCHECK
-    has_healthcheck = any(re.match(r"^\s*HEALTHCHECK\s+", l, re.IGNORECASE) for l in lines)
+    has_healthcheck = any(re.match(r"^\s*HEALTHCHECK\s+", line, re.IGNORECASE) for line in lines)
     if not has_healthcheck:
         findings.append(DockerfileFinding(
             line=0, rule="DF-101", severity="low",
             message="No HEALTHCHECK instruction.",
             fix="Add HEALTHCHECK --interval=30s CMD curl -f http://localhost/ || exit 1",
         ))
-
-    # Check FROM scratch
-    from_scratch = any(re.match(r"^\s*FROM\s+scratch\s*$", l, re.IGNORECASE) for l in lines)
 
     # Build gate result
     critical = sum(1 for f in findings if f.severity == "critical")

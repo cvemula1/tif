@@ -48,7 +48,6 @@ def harden_dockerfile(
     hardened_lines: List[str] = []
     has_user = False
     has_healthcheck = False
-    last_from_line = -1
     entrypoint_line = -1
 
     for i, line in enumerate(lines):
@@ -56,7 +55,7 @@ def harden_dockerfile(
 
         # Track last FROM and ENTRYPOINT/CMD
         if re.match(r"^\s*FROM\s+", line, re.IGNORECASE):
-            last_from_line = len(hardened_lines)
+            pass
 
         if re.match(r"^\s*(ENTRYPOINT|CMD)\s+", line, re.IGNORECASE):
             entrypoint_line = len(hardened_lines)
@@ -64,7 +63,7 @@ def harden_dockerfile(
         # Replace ADD with COPY for local files
         if re.match(r"^\s*ADD\s+(?!https?://)", line, re.IGNORECASE):
             modified = re.sub(r"^(\s*)ADD\s+", r"\1COPY ", line, flags=re.IGNORECASE)
-            hardened_lines.append(f"# TIF: replaced ADD with COPY for security")
+            hardened_lines.append("# TIF: replaced ADD with COPY for security")
 
         # Pin :latest to warning comment
         if re.match(r"^\s*FROM\s+\S+:latest", line, re.IGNORECASE):
@@ -82,7 +81,7 @@ def harden_dockerfile(
 
         # Remove secrets from ENV
         if re.match(r"^\s*ENV\s+\S*(PASSWORD|SECRET|TOKEN|KEY|CREDENTIALS)\s*=", line, re.IGNORECASE):
-            hardened_lines.append(f"# TIF: removed hardcoded secret — use runtime secrets instead")
+            hardened_lines.append("# TIF: removed hardcoded secret — use runtime secrets instead")
             hardened_lines.append(f"# {line}")
             continue
 
@@ -139,7 +138,7 @@ def harden_dockerfile(
     label_idx = _find_after_first_from(hardened_lines)
     labels = [
         'LABEL org.opencontainers.image.source="https://github.com/OWNER/REPO"',
-        f'LABEL org.opencontainers.image.description="Hardened by TIF"',
+        'LABEL org.opencontainers.image.description="Hardened by TIF"',
     ]
     for j, label in enumerate(labels):
         hardened_lines.insert(label_idx + j, label)

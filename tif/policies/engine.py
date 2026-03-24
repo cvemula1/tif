@@ -5,10 +5,9 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from tif.core.trust_card import ComplianceResult, GateResult, TrustCard, Verdict
 
@@ -252,7 +251,7 @@ def _builtin_nist_800_190(card: TrustCard) -> dict:
         total += 1
         if card.vulnerabilities.scanned:
             if card.vulnerabilities.critical > 0:
-                deny.append(f"Critical vulnerabilities present (NIST 4.1.1)")
+                deny.append("Critical vulnerabilities present (NIST 4.1.1)")
             if card.vulnerabilities.high > 5:
                 deny.append(f"Excessive high vulnerabilities: {card.vulnerabilities.high} (NIST 4.1.1)")
 

@@ -237,7 +237,6 @@ def _oci_registry_inspect(image: str) -> Optional[dict]:
             return None
 
         # Handle manifest list / index (multi-arch)
-        schema = manifest.get("schemaVersion", 0)
         media_type = manifest.get("mediaType", "")
         if "manifest.list" in media_type or "image.index" in media_type:
             # Pick linux/amd64
