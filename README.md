@@ -13,11 +13,13 @@ One command. One artifact. Zero noise.
 
 </div>
 
+**TIF (Trusted Image Framework)** is an open-source CLI that verifies container image trust -- signer identity, provenance, digest immutability, SBOM, and policy -- before build or deployment.
+
 ## Why TIF?
 
 Scanner alert fatigue is real. 70% of CVE alerts are false positives. 85% are in packages never loaded at runtime. Teams stop looking.
 
-TIF cuts through the noise: one command produces a **compliance-ready Trust Card** — a signed, scored JSON artifact stored with your image — showing only the vulnerabilities you can actually fix.
+TIF cuts through the noise: one command produces a **compliance-ready Trust Card** -- a signed, scored JSON artifact stored with your image -- showing only the vulnerabilities you can actually fix.
 
 > For teams with SOC 2, FedRAMP, or NIST 800-190 requirements: TIF's Trust Card is the auditable proof your compliance team needs.
 
