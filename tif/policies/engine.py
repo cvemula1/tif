@@ -148,6 +148,8 @@ def _eval_builtin(card: TrustCard, policy_pack: str) -> Optional[dict]:
         return _builtin_cis_l2(card)
     elif policy_pack == "nist-800-190":
         return _builtin_nist_800_190(card)
+    elif policy_pack == "dod-stig":
+        return _builtin_dod_stig(card)
     return None
 
 
@@ -285,6 +287,59 @@ def _builtin_nist_800_190(card: TrustCard) -> dict:
     }
 
 
+def _builtin_dod_stig(card: TrustCard) -> dict:
+    """DISA STIG / FedRAMP — strictest built-in policy."""
+    deny = []
+    total = 0
+
+    if _gate_available(card, "Signature"):
+        total += 1
+        if not card.signature.verified:
+            deny.append("STIG V-222399: Image signature not verified by trusted authority")
+
+    if _gate_available(card, "Vulnerabilities"):
+        total += 1
+        if card.vulnerabilities.scanned:
+            if card.vulnerabilities.critical > 0:
+                deny.append(
+                    f"STIG V-222400: {card.vulnerabilities.critical} critical vulnerabilities (must be 0)"
+                )
+            if card.vulnerabilities.high > 0:
+                deny.append(
+                    f"STIG V-222400: {card.vulnerabilities.high} high vulnerabilities (must be 0)"
+                )
+
+    if _gate_available(card, "SBOM"):
+        total += 1
+        if not card.sbom.present:
+            deny.append("STIG V-222401: No SBOM attached to image")
+
+    if _gate_available(card, "Attestation"):
+        total += 1
+        if not card.attestation.present or card.attestation.slsa_level < 2:
+            deny.append("STIG V-222402: Build provenance not verified (requires SLSA Level 2+)")
+
+    if _gate_available(card, "Image Security"):
+        total += 3
+        if not card.security.rootless:
+            deny.append("STIG V-222403: Container runs as root (must be non-root)")
+        if not card.security.from_scratch:
+            deny.append("STIG V-222404: Image not built FROM scratch")
+        if not card.security.read_only_rootfs:
+            deny.append("STIG V-222405: Root filesystem is not read-only")
+
+    if total == 0:
+        return {"DOD-STIG": {"allow": True, "deny": [], "total": 0, "passed": 0}}
+    return {
+        "DOD-STIG": {
+            "allow": len(deny) == 0,
+            "deny": deny,
+            "total": total,
+            "passed": total - len(deny),
+        }
+    }
+
+
 def list_policy_packs() -> List[str]:
     """List available built-in policy packs."""
     packs = []
@@ -292,7 +347,7 @@ def list_policy_packs() -> List[str]:
         for f in sorted(PACKS_DIR.glob("*.rego")):
             packs.append(f.stem)
     # Always include built-in Python packs
-    for name in ("default", "cis-l1", "cis-l2", "nist-800-190"):
+    for name in ("default", "cis-l1", "cis-l2", "nist-800-190", "dod-stig"):
         if name not in packs:
             packs.append(name)
     return packs

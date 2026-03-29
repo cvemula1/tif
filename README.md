@@ -61,10 +61,10 @@ alias tif='docker run --rm ghcr.io/cvemula1/tif'
 tif verify myapp:1.0 --only-fixable --policy-pack cis-l2 --ci
 ```
 
-### pip install (coming soon)
+### pip install
 
 ```bash
-pip install tif                                    # WIP — PyPI publishing in progress
+pip install tif
 tif demo                                          # works immediately
 tif verify registry.io/myapp:1.0 --only-fixable  # full scan (needs cosign + grype)
 ```
@@ -414,9 +414,10 @@ tif/
 ## Roadmap
 
 - [x] **v0.1** -- 7 trust gates, NIST-aligned scoring, 5 policy packs, Dockerfile scanner/hardener, Trust Card push, multi-arch Docker image
-- [ ] **v0.2** -- Notary v2 signing, SARIF output, `--only-fixable` enhancements
-- [ ] **v0.3** -- Trust Card registry (store/query/trend), webhook notifications
-- [ ] **v0.4** -- ML-based risk scoring, auto-remediation suggestions
+- [x] **v0.2** -- Switch to Grype scanner, Docker image optimizations (~90 MB smaller), dod-stig built-in policy, .rego policy pack packaging fix
+- [ ] **v0.3** -- Notary v2 signing, SARIF output, `--only-fixable` enhancements
+- [ ] **v0.4** -- Trust Card registry (store/query/trend), webhook notifications
+- [ ] **v0.5** -- ML-based risk scoring, auto-remediation suggestions
 
 ## Contributing
 

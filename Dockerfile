@@ -3,6 +3,7 @@ FROM debian:bookworm-slim AS tooling
 
 ARG COSIGN_VERSION=v2.4.1
 ARG GRYPE_VERSION=0.87.0
+ARG SKOPEO_VERSION=v1.22.0
 ARG SYFT_VERSION=v1.19.0
 ARG TARGETARCH
 
@@ -22,6 +23,12 @@ RUN curl -sSfL \
     | tar -xz -C /usr/local/bin grype \
     && chmod +x /usr/local/bin/grype
 
+# skopeo — static binary (avoids ~100 MB of apt transitive deps)
+RUN curl -sSfL \
+    "https://github.com/lework/skopeo-binary/releases/download/${SKOPEO_VERSION}/skopeo-linux-${TARGETARCH}" \
+    -o /usr/local/bin/skopeo \
+    && chmod +x /usr/local/bin/skopeo
+
 # syft — pinned release
 RUN curl -sSfL \
     "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/syft_$(echo ${SYFT_VERSION} | tr -d v)_linux_${TARGETARCH}.tar.gz" \
@@ -33,14 +40,12 @@ RUN curl -sSfL \
 FROM python:3.12-slim AS runtime
 
 # Copy pinned tools from tooling stage
-COPY --from=tooling /usr/local/bin/cosign /usr/local/bin/cosign
-COPY --from=tooling /usr/local/bin/grype  /usr/local/bin/grype
-COPY --from=tooling /usr/local/bin/syft   /usr/local/bin/syft
+COPY --from=tooling /usr/local/bin/cosign  /usr/local/bin/cosign
+COPY --from=tooling /usr/local/bin/grype   /usr/local/bin/grype
+COPY --from=tooling /usr/local/bin/skopeo  /usr/local/bin/skopeo
+COPY --from=tooling /usr/local/bin/syft    /usr/local/bin/syft
 
-# Install skopeo from debian packages (version pinned via apt)
-# and jq for debugging / scripting
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    skopeo \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
