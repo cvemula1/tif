@@ -44,9 +44,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install tif Python package
+# Pre-install Python dependencies (layer cached until pyproject.toml changes)
+COPY pyproject.toml /src/pyproject.toml
+RUN pip install --no-cache-dir \
+    $(python3 -c "import tomllib,pathlib; print(' '.join(tomllib.loads(pathlib.Path('/src/pyproject.toml').read_text())['project']['dependencies']))")
+
+# Install tif package (--no-deps since deps are already installed above)
 COPY . /src
-RUN pip install --no-cache-dir /src && rm -rf /src
+RUN pip install --no-cache-dir --no-deps /src && rm -rf /src
 
 # Non-root user
 RUN useradd -m -s /bin/bash tif

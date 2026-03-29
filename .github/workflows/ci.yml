@@ -52,8 +52,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Build image
-        run: docker build -t tif:ci-test .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: tif:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Smoke test — demo
         run: docker run --rm tif:ci-test demo --ascii
       - name: Smoke test — version
