@@ -6,14 +6,13 @@
 
 One command. One artifact. Zero noise.
 
-[![PyPI](https://img.shields.io/pypi/v/tif?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/tif/)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fcvemula1%2Ftif-blue?logo=docker)](https://ghcr.io/cvemula1/tif)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/cvemula1/tif?style=social)](https://github.com/cvemula1/tif)
 
 **TIF (Trusted Image Framework)** is an open-source CLI that verifies container image trust -- signer identity, provenance, digest immutability, SBOM, and policy -- before build or deployment.
 
-[Quick Start](#-quick-start) | [Real Results](#-real-world-results) | [Trust Card](#-trust-card) | [CI/CD](#-cicd-integration) | [Dockerfile Security](#-dockerfile-security)
+[Quick Start](#quick-start) | [Real Results](#real-world-results) | [Trust Card](#trust-card) | [CI/CD](#cicd-integration) | [Dockerfile Security](#dockerfile-security)
 
 </div>
 
@@ -62,10 +61,10 @@ alias tif='docker run --rm ghcr.io/cvemula1/tif'
 tif verify myapp:1.0 --only-fixable --policy-pack cis-l2 --ci
 ```
 
-### pip install
+### pip install (coming soon)
 
 ```bash
-pip install tif
+pip install tif                                    # WIP — PyPI publishing in progress
 tif demo                                          # works immediately
 tif verify registry.io/myapp:1.0 --only-fixable  # full scan (needs cosign + grype)
 ```
