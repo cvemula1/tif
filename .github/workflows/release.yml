@@ -13,6 +13,7 @@ permissions:
   contents: write        # create GitHub releases
   packages: write        # push to GHCR
   id-token: write        # keyless cosign signing via OIDC
+  attestations: write    # actions/attest-build-provenance
 
 jobs:
   test:
@@ -109,12 +110,18 @@ jobs:
           cosign sign --yes \
             ghcr.io/cvemula1/tif@${{ needs.build-push.outputs.digest }}
 
+      - name: Resolve Docker Hub digest
+        id: dockerhub-digest
+        run: |
+          DIGEST=$(docker buildx imagetools inspect docker.io/chvemula/tif:${{ github.ref_name }} --format '{{.Manifest.Digest}}')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
       - name: Sign Docker Hub image (keyless via GitHub OIDC)
         env:
           COSIGN_EXPERIMENTAL: "1"
         run: |
           cosign sign --yes \
-            docker.io/chvemula/tif:${{ github.ref_name }}
+            docker.io/chvemula/tif@${{ steps.dockerhub-digest.outputs.digest }}
 
       - name: Generate SBOM
         run: |
@@ -138,7 +145,7 @@ jobs:
           cosign attest --yes \
             --predicate sbom.spdx.json \
             --type spdx \
-            docker.io/chvemula/tif:${{ github.ref_name }}
+            docker.io/chvemula/tif@${{ steps.dockerhub-digest.outputs.digest }}
 
       - name: Generate SLSA provenance
         uses: actions/attest-build-provenance@v2
