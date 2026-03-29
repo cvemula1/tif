@@ -23,7 +23,7 @@ def verify_image(
     check_policy: bool = True,
     # Options
     cosign_key: Optional[str] = None,
-    scanner: str = "trivy",
+    scanner: str = "grype",
     fail_on_critical: bool = True,
     max_high: int = 10,
     only_fixable: bool = False,
@@ -40,7 +40,7 @@ def verify_image(
         image: Full image reference (e.g. registry.io/app:1.0 or @sha256:...)
         check_*: Toggle individual gates
         cosign_key: Path to cosign public key (None = keyless)
-        scanner: Vulnerability scanner (trivy or grype)
+        scanner: Vulnerability scanner (grype or trivy)
         fail_on_critical: Fail vuln gate on any critical CVE
         max_high: Max high CVEs before vuln gate fails
         only_fixable: Only count CVEs that have a fix available (reduces alert fatigue)
@@ -214,7 +214,7 @@ def build_demo_card() -> TrustCard:
     # Vulnerabilities — 0 critical, 2 high, 5 medium
     card.vulnerabilities = VulnerabilityInfo(
         scanned=True,
-        scanner="trivy",
+        scanner="grype",
         critical=0,
         high=2,
         medium=5,

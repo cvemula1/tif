@@ -2,7 +2,7 @@
 FROM debian:bookworm-slim AS tooling
 
 ARG COSIGN_VERSION=v2.4.1
-ARG TRIVY_VERSION=0.69.3
+ARG GRYPE_VERSION=0.87.0
 ARG SYFT_VERSION=v1.19.0
 ARG TARGETARCH
 
@@ -16,9 +16,11 @@ RUN curl -sSfL \
     -o /usr/local/bin/cosign \
     && chmod +x /usr/local/bin/cosign
 
-# trivy — pinned release via official install script
-RUN curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-    | sh -s -- -b /usr/local/bin v${TRIVY_VERSION}
+# grype — pinned release
+RUN curl -sSfL \
+    "https://github.com/anchore/grype/releases/download/v${GRYPE_VERSION}/grype_${GRYPE_VERSION}_linux_${TARGETARCH}.tar.gz" \
+    | tar -xz -C /usr/local/bin grype \
+    && chmod +x /usr/local/bin/grype
 
 # syft — pinned release
 RUN curl -sSfL \
@@ -32,7 +34,7 @@ FROM python:3.12-slim AS runtime
 
 # Copy pinned tools from tooling stage
 COPY --from=tooling /usr/local/bin/cosign /usr/local/bin/cosign
-COPY --from=tooling /usr/local/bin/trivy  /usr/local/bin/trivy
+COPY --from=tooling /usr/local/bin/grype  /usr/local/bin/grype
 COPY --from=tooling /usr/local/bin/syft   /usr/local/bin/syft
 
 # Install skopeo from debian packages (version pinned via apt)

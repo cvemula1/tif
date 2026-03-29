@@ -26,8 +26,8 @@ verify-trust:
     # Install cosign
     - curl -sSfL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
         -o /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
-    # Install trivy
-    - curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+    # Install grype
+    - curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh
         | sh -s -- -b /usr/local/bin
   script:
     - tif verify $IMAGE --policy-pack cis-l1 --fail-on high --ci --output trust-card.json

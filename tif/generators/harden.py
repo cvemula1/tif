@@ -53,10 +53,7 @@ def harden_dockerfile(
     for i, line in enumerate(lines):
         modified = line
 
-        # Track last FROM and ENTRYPOINT/CMD
-        if re.match(r"^\s*FROM\s+", line, re.IGNORECASE):
-            pass
-
+        # Track ENTRYPOINT/CMD position
         if re.match(r"^\s*(ENTRYPOINT|CMD)\s+", line, re.IGNORECASE):
             entrypoint_line = len(hardened_lines)
 

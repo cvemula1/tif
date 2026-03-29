@@ -39,7 +39,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) for automati
 Examples:
 ```
 feat: add --only-fixable flag to reduce alert fatigue
-fix: handle missing CVSS score in Trivy output
+fix: handle missing CVSS score in Grype output
 feat!: rename Trust Card schema field (breaking change)
 ```
 

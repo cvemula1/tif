@@ -39,7 +39,7 @@ dependencies = [
 
 [project.optional-dependencies]
 cosign = ["sigstore>=3.0"]
-trivy = []
+grype = []
 all = ["sigstore>=3.0"]
 dev = [
     "pytest>=7.0",

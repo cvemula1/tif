@@ -23,7 +23,7 @@ def validate_sbom(
     """
     Check if a container image has an attached SBOM and validate it.
 
-    Uses cosign to download SBOM attestation, or trivy to generate one.
+    Uses cosign to download SBOM attestation, or syft to generate one.
 
     Args:
         image: Full image reference
@@ -39,9 +39,9 @@ def validate_sbom(
     # Try: download attached SBOM via cosign
     sbom_data = _fetch_sbom_cosign(image)
 
-    # Fallback: generate SBOM via trivy/syft
+    # Fallback: generate SBOM via syft
     if sbom_data is None:
-        sbom_data = _generate_sbom_trivy(image)
+        sbom_data = _generate_sbom_syft(image)
 
     # Fallback: check OCI registry for attached SBOMs (pure Python)
     if sbom_data is None:
@@ -108,22 +108,8 @@ def _fetch_sbom_cosign(image: str) -> Optional[dict]:
     return None
 
 
-def _generate_sbom_trivy(image: str) -> Optional[dict]:
-    """Generate SBOM using trivy sbom command."""
-    try:
-        cmd = [
-            "trivy", "image",
-            "--format", "spdx-json",
-            "--quiet",
-            image,
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        if result.returncode == 0 and result.stdout.strip():
-            return json.loads(result.stdout)
-    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
-        pass
-
-    # Try syft as another fallback
+def _generate_sbom_syft(image: str) -> Optional[dict]:
+    """Generate SBOM using syft."""
     try:
         cmd = ["syft", image, "-o", "spdx-json", "--quiet"]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)

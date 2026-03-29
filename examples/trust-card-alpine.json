@@ -18,7 +18,7 @@
     "format": "spdx-2.3",
     "packages": 42,
     "licenses": ["MIT", "BSD-2-Clause", "GPL-2.0-only"],
-    "supplier": "Tool: trivy-0.58.0",
+    "supplier": "Tool: syft-1.19.0",
     "completeness_score": 0.92,
     "error": ""
   },
@@ -33,7 +33,7 @@
   },
   "vulnerabilities": {
     "scanned": true,
-    "scanner": "trivy",
+    "scanner": "grype",
     "critical": 0,
     "high": 0,
     "medium": 1,
