@@ -44,7 +44,7 @@ tif verify registry.io/myapp:1.0 --only-fixable --policy-pack cis-l2 --ci
 ```bash
 pip install tif
 tif demo                                          # works immediately (no tools needed)
-tif verify registry.io/myapp:1.0 --only-fixable  # full verification (needs cosign + trivy)
+tif verify registry.io/myapp:1.0 --only-fixable  # full verification (needs cosign + grype)
 ```
 
 ## Verify TIF Itself
@@ -68,8 +68,8 @@ cosign verify-attestation --type spdx ghcr.io/cvemula1/tif:latest \
 | Gate | What It Does | Tool Used |
 |------|-------------|-----------|
 | **Signature** | Verify image is signed by trusted identity | Cosign (keyless or key-based) |
-| **Vulnerabilities** | Scan for CVEs, gate on severity thresholds | Trivy or Grype |
-| **SBOM** | Check SBOM is attached and complete | Cosign + Trivy/Syft |
+| **Vulnerabilities** | Scan for CVEs, gate on severity thresholds | Grype or Trivy |
+| **SBOM** | Check SBOM is attached and complete | Cosign + Syft |
 | **Attestation** | Verify SLSA provenance and build origin | slsa-verifier / Cosign |
 | **Image Security** | Check rootless, FROM scratch, read-only rootfs | Docker / Skopeo |
 | **End-of-Life** | Check base image EOL status via endoflife.date API | endoflife.date / NIST |
@@ -97,7 +97,7 @@ cosign verify-attestation --type spdx ghcr.io/cvemula1/tif:latest \
   └───────────────────┴─────────┴──────────────────────────────────────┘
 
   Signature:       [PASS] Verified  Signer: cosign
-  Vulnerabilities: 2 high, 5 medium, 12 low (trivy)
+  Vulnerabilities: 2 high, 5 medium, 12 low (grype)
     ↳ 38 additional CVEs suppressed (no fix available)
   Top fixable CVEs:
     CVE-2024-3094 openssl@3.0.1 → 3.0.2 (CVSS 9.8)
@@ -114,11 +114,11 @@ cosign verify-attestation --type spdx ghcr.io/cvemula1/tif:latest \
 ```bash
 # Without --only-fixable: 183 findings, team ignores scanner
 tif verify myapp:latest
-# → Vulnerabilities: 12 critical, 47 high, 124 medium (trivy)
+# → Vulnerabilities: 12 critical, 47 high, 124 medium (grype)
 
 # With --only-fixable: only counts actionable CVEs
 tif verify myapp:latest --only-fixable
-# → Vulnerabilities: 1 critical, 3 high, 8 medium (trivy)
+# → Vulnerabilities: 1 critical, 3 high, 8 medium (grype)
 # → ↳ 50 additional CVEs suppressed (no fix available)
 # → Top fixable CVEs:
 # →   CVE-2024-3094 openssl@3.0.1 → 3.0.2 (CVSS 9.8)
@@ -358,7 +358,7 @@ OCI labels (`tif.trust-score`, `tif.verdict`, `tif.critical-cves`, etc.) are bak
 ```
 tif verify IMAGE [OPTIONS]        Run all trust gates on a container image
   --key PATH                      Cosign public key (default: keyless Sigstore)
-  --scanner {trivy,grype}         Vulnerability scanner (default: trivy)
+  --scanner {grype,trivy}         Vulnerability scanner (default: grype)
   --policy PATH                   Custom .rego policy file
   --policy-pack NAME              Built-in policy pack (default: default)
   --fail-on {critical,high,medium,low}  Vulnerability severity gate
@@ -396,7 +396,7 @@ graph LR
 
   subgraph "TIF Trust Gates"
     sig["Signature<br/>Cosign / Notary"]
-    vuln["Vulnerabilities<br/>Trivy / Grype"]
+    vuln["Vulnerabilities<br/>Grype / Trivy"]
     sbom["SBOM<br/>SPDX / CycloneDX"]
     attest["Attestation<br/>SLSA Provenance"]
     sec["Image Security<br/>Rootless / Scratch"]
@@ -427,7 +427,7 @@ tif/
 │   └── output.py                 # Rich table, JSON formatters
 ├── validators/
 │   ├── signature.py              # Cosign signature verification
-│   ├── vulnerability.py          # Trivy/Grype scanning
+│   ├── vulnerability.py          # Grype/Trivy scanning
 │   ├── sbom.py                   # SPDX/CycloneDX validation
 │   ├── attestation.py            # SLSA provenance verification
 │   ├── image.py                  # Image security inspection
@@ -449,11 +449,11 @@ tif/
 
 ## Comparison
 
-| Feature | TIF | Cosign | Trivy | Grype | Kyverno |
+| Feature | TIF | Cosign | Grype | Trivy | Kyverno |
 |---------|-----|--------|-------|-------|---------|
 | Signature verification | Yes | Yes | -- | -- | Yes |
 | Vulnerability scanning | Yes | -- | Yes | Yes | -- |
-| SBOM validation | Yes | Partial | Yes | -- | -- |
+| SBOM validation | Yes | Partial | -- | Yes | -- |
 | SLSA attestation | Yes | Yes | -- | -- | Yes |
 | Image hardening checks | Yes | -- | -- | -- | -- |
 | Policy compliance | Yes | -- | -- | -- | Yes |

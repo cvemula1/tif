@@ -23,7 +23,7 @@ tif verify ...
 **Environment**
 - OS:
 - Docker version (if using Docker):
-- Installed tools: cosign / trivy / grype / syft / skopeo (versions)
+- Installed tools: cosign / grype / syft / skopeo (versions)
 
 **Additional context**
 <!-- Any other relevant info -->

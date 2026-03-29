@@ -50,10 +50,10 @@ runs:
     - name: Install cosign
       uses: sigstore/cosign-installer@v3
 
-    - name: Install Trivy
+    - name: Install Grype
       shell: bash
       run: |
-        curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+        curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh \
           | sh -s -- -b /usr/local/bin
 
     - name: Install TIF

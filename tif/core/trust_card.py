@@ -91,7 +91,7 @@ class CVEDetail:
 class VulnerabilityInfo:
     """Vulnerability scan summary."""
     scanned: bool = False
-    scanner: str = ""           # trivy, grype, snyk
+    scanner: str = ""           # grype, trivy, snyk
     critical: int = 0
     high: int = 0
     medium: int = 0
