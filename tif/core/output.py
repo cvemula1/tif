@@ -3,8 +3,6 @@
 
 from __future__ import annotations
 
-import json
-import sys
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -42,7 +40,7 @@ def print_trust_card(card: "TrustCard", ascii_mode: bool = False) -> None:
         from rich.console import Console
         from rich.panel import Panel
         from rich.table import Table
-        from rich.text import Text
+
     except ImportError:
         # Fallback to plain text
         print_trust_card_plain(card)
@@ -59,7 +57,7 @@ def print_trust_card(card: "TrustCard", ascii_mode: bool = False) -> None:
     console.print()
     console.print(Panel(
         f"[bold {color}]{header}[/]",
-        title=f"[bold]TIF Trust Card[/]",
+        title="[bold]TIF Trust Card[/]",
         subtitle=f"[dim]{card.image}[/]" if card.tag and card.image.endswith(f":{card.tag}") else (f"[dim]{card.image}:{card.tag}[/]" if card.tag else f"[dim]{card.image}[/]"),
         border_style=color,
     ))
@@ -213,7 +211,7 @@ def _print_failure_summary(console, card: "TrustCard") -> None:
             elif "attestation" in name:
                 console.print("    - Add provenance: use slsa-github-generator in CI")
             elif "end-of-life" in name or "eol" in name:
-                console.print(f"    - Upgrade base image to a supported version")
+                console.print("    - Upgrade base image to a supported version")
             elif "image security" in name:
                 console.print("    - Add USER, HEALTHCHECK, and --read-only to your Dockerfile")
             elif "policy" in name:
@@ -227,7 +225,7 @@ def _print_failure_summary(console, card: "TrustCard") -> None:
                     console.print("    - Install grype: brew install grype")
             elif "eol" in name or "end-of-life" in name:
                 if "days" in g.reason.lower():
-                    console.print(f"    - Plan base image upgrade before EOL")
+                    console.print("    - Plan base image upgrade before EOL")
 
 
 def _print_eol_summary(console, card: "TrustCard", ascii_mode: bool) -> None:
@@ -264,7 +262,7 @@ def _print_eol_summary(console, card: "TrustCard", ascii_mode: bool) -> None:
 def print_trust_card_plain(card: "TrustCard") -> None:
     """Plain text output when Rich is not available."""
     print()
-    print(f"═══ TIF Trust Card ═══")
+    print("═══ TIF Trust Card ═══")
     print(f"Image:       {card.image}:{card.tag}" if card.tag else f"Image: {card.image}")
     print(f"Verdict:     {card.verdict.value}")
     print(f"Trust Score: {card.trust_score}/100")

@@ -90,7 +90,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     policy_sub = policy_parser.add_subparsers(dest="policy_command")
 
-    policy_list_parser = policy_sub.add_parser("list", help="List available policy packs")
+    policy_sub.add_parser("list", help="List available policy packs")
 
     policy_check_parser = policy_sub.add_parser(
         "check", help="Evaluate a Trust Card JSON against a policy",

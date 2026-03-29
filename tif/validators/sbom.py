@@ -64,7 +64,7 @@ def validate_sbom(
 
     # Evaluate completeness: score based on packages with license info declared
     if info.packages > 0:
-        licensed = len([l for l in info.licenses if l and l != "NOASSERTION"])
+        licensed = len([lic for lic in info.licenses if lic and lic != "NOASSERTION"])
         # Heuristic: ratio of distinct licenses declared vs packages (capped at 1.0)
         # A well-formed SBOM has license info for most packages
         info.completeness_score = min(1.0, (licensed + 1) / max(info.packages * 0.5, 1))
