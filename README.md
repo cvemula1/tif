@@ -34,8 +34,8 @@ For teams with **SOC 2, FedRAMP, or NIST 800-190** requirements: TIF's Trust Car
 | Gate | What It Checks | Tool |
 |:-----|:--------------|:-----|
 | **Signature** | Image signed by trusted identity | Cosign (keyless or key-based) |
-| **Vulnerabilities** | CVEs with severity gating + fixable-only filter | Trivy / Grype |
-| **SBOM** | Software Bill of Materials attached and complete | Cosign + Trivy / Syft |
+| **Vulnerabilities** | CVEs with severity gating + fixable-only filter | Grype / Trivy |
+| **SBOM** | Software Bill of Materials attached and complete | Cosign + Syft |
 | **Attestation** | SLSA provenance and build origin | slsa-verifier / Cosign |
 | **Image Security** | Rootless, FROM scratch, read-only rootfs, HEALTHCHECK | Docker / Skopeo |
 | **End-of-Life** | Base image EOL status via endoflife.date API | endoflife.date |
@@ -47,7 +47,7 @@ For teams with **SOC 2, FedRAMP, or NIST 800-190** requirements: TIF's Trust Car
 
 ### Docker (recommended -- zero setup, multi-arch)
 
-All trust tools (cosign, trivy, syft, skopeo) pre-installed. Runs natively on **amd64** and **arm64** (Apple Silicon).
+All trust tools (cosign, grype, syft, skopeo) pre-installed. Runs natively on **amd64** and **arm64** (Apple Silicon).
 
 ```bash
 docker run --rm ghcr.io/cvemula1/tif verify alpine:3.20
@@ -67,7 +67,7 @@ tif verify myapp:1.0 --only-fixable --policy-pack cis-l2 --ci
 ```bash
 pip install tif
 tif demo                                          # works immediately
-tif verify registry.io/myapp:1.0 --only-fixable  # full scan (needs cosign + trivy)
+tif verify registry.io/myapp:1.0 --only-fixable  # full scan (needs cosign + grype)
 ```
 
 ---
@@ -113,7 +113,7 @@ We ran TIF against popular Docker Hub images. Here's what we found:
 
   Next steps:
     - Upgrade to nginx:1.28 or nginx:mainline
-    - Fix CVEs: trivy image nginx:1.27 --severity CRITICAL,HIGH
+    - Fix CVEs: grype nginx:1.27 --only-fixed
     - Add USER, HEALTHCHECK, and --read-only to your Dockerfile
 ```
 
@@ -129,7 +129,7 @@ tif verify myapp:latest --only-fixable   # 12 actionable → team fixes them
 ```
 
 ```
-Vulnerabilities: 1 critical, 3 high, 8 medium (trivy)
+Vulnerabilities: 1 critical, 3 high, 8 medium (grype)
   ↳ 171 CVEs suppressed (no fix available)
 Top fixable CVEs:
   CVE-2024-3094 openssl@3.0.1 → 3.0.2 (CVSS 9.8)
@@ -309,7 +309,7 @@ graph LR
 
   subgraph "TIF Trust Gates"
     sig["Signature<br/>Cosign / Notary"]
-    vuln["Vulnerabilities<br/>Trivy / Grype"]
+    vuln["Vulnerabilities<br/>Grype / Trivy"]
     sbom["SBOM<br/>SPDX / CycloneDX"]
     attest["Attestation<br/>SLSA Provenance"]
     sec["Image Security<br/>Rootless / Scratch"]
@@ -333,11 +333,11 @@ graph LR
 
 ## vs. Other Tools
 
-| Feature | TIF | Cosign | Trivy | Grype | Kyverno |
+| Feature | TIF | Cosign | Grype | Trivy | Kyverno |
 |:--------|:---:|:------:|:-----:|:-----:|:-------:|
 | Signature verification | **Yes** | Yes | -- | -- | Yes |
 | Vulnerability scanning | **Yes** | -- | Yes | Yes | -- |
-| SBOM validation | **Yes** | Partial | Yes | -- | -- |
+| SBOM validation | **Yes** | Partial | -- | Yes | -- |
 | SLSA attestation | **Yes** | Yes | -- | -- | Yes |
 | Image hardening checks | **Yes** | -- | -- | -- | -- |
 | Policy compliance | **Yes** | -- | -- | -- | Yes |
@@ -356,7 +356,7 @@ graph LR
 ```
 tif verify IMAGE [OPTIONS]        Run all trust gates on a container image
   --key PATH                      Cosign public key (default: keyless Sigstore)
-  --scanner {trivy,grype}         Vulnerability scanner (default: trivy)
+  --scanner {grype,trivy}         Vulnerability scanner (default: grype)
   --policy PATH                   Custom .rego policy file
   --policy-pack NAME              Built-in policy pack (default, cis-l1, cis-l2, nist-800-190, dod-stig)
   --fail-on {critical,high,medium,low}  Vulnerability severity gate
@@ -395,7 +395,7 @@ tif/
 │   └── output.py                 # Rich table + JSON formatters
 ├── validators/
 │   ├── signature.py              # Cosign verification
-│   ├── vulnerability.py          # Trivy/Grype scanning
+│   ├── vulnerability.py          # Grype/Trivy scanning
 │   ├── sbom.py                   # SPDX/CycloneDX validation
 │   ├── attestation.py            # SLSA provenance
 │   ├── image.py                  # Image security inspection

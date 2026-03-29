@@ -204,7 +204,7 @@ def _print_failure_summary(console, card: "TrustCard") -> None:
             if "signature" in name:
                 console.print("    - Sign the image: cosign sign <image>")
             elif "vulnerabilit" in name:
-                console.print("    - Fix CVEs: trivy image <image> --severity CRITICAL,HIGH")
+                console.print("    - Fix CVEs: grype <image> --only-fixed")
                 console.print("    - Reduce noise: tif verify <image> --only-fixable")
             elif "sbom" in name:
                 console.print("    - Attach SBOM: syft <image> -o spdx-json | cosign attach sbom --sbom /dev/stdin <image>")
@@ -221,8 +221,8 @@ def _print_failure_summary(console, card: "TrustCard") -> None:
             if "not installed" in g.reason.lower():
                 if "cosign" in g.reason.lower():
                     console.print("    - Install cosign: brew install cosign")
-                elif "trivy" in g.reason.lower():
-                    console.print("    - Install trivy: brew install trivy")
+                elif "grype" in g.reason.lower():
+                    console.print("    - Install grype: brew install grype")
             elif "eol" in name or "end-of-life" in name:
                 if "days" in g.reason.lower():
                     console.print("    - Plan base image upgrade before EOL")

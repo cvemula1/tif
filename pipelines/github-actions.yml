@@ -42,7 +42,7 @@ jobs:
       #     image: ghcr.io/${{ github.repository }}:${{ github.sha }}
       #     policy-pack: "cis-l1"
 
-      # Option 3: pip install (needs cosign + trivy on PATH)
+      # Option 3: pip install (needs cosign + grype on PATH)
       # - name: Install TIF
       #   run: pip install tif
       # - name: Verify

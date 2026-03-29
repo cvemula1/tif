@@ -35,8 +35,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     verify_parser.add_argument("image", help="Container image reference (e.g. registry.io/app:1.0)")
     verify_parser.add_argument("--key", help="Path to cosign public key (default: keyless)")
     verify_parser.add_argument(
-        "--scanner", choices=["trivy", "grype"], default="trivy",
-        help="Vulnerability scanner (default: trivy)",
+        "--scanner", choices=["grype", "trivy"], default="grype",
+        help="Vulnerability scanner (default: grype)",
     )
     verify_parser.add_argument(
         "--policy", help="Path to custom .rego policy file",
@@ -79,7 +79,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     inspect_parser.add_argument("image", help="Container image reference")
     inspect_parser.add_argument("--key", help="Cosign public key path")
-    inspect_parser.add_argument("--scanner", choices=["trivy", "grype"], default="trivy")
+    inspect_parser.add_argument("--scanner", choices=["grype", "trivy"], default="grype")
     inspect_parser.add_argument("-f", "--format", choices=["table", "json", "card"], default="table")
     inspect_parser.add_argument("--ascii", action="store_true")
 
