@@ -98,6 +98,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          provenance: false
           tags: |
             ghcr.io/cvemula1/tif:edge
             docker.io/chvemula/tif:edge
